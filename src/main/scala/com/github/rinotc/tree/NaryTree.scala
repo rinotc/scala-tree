@@ -1,7 +1,6 @@
 package com.github.rinotc.tree
 
 import scala.annotation.tailrec
-import scala.collection.mutable
 
 /**
  * 多分木

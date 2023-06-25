@@ -58,7 +58,7 @@ class NaryTreeTest extends BaseTest {
       type A = Int
     }
 
-    it("") {
+    it("隣接リストから多分木を構築する") {
 
       val e1 = AdjEle(1, None)
       val e2 = AdjEle(2, Some(1))
