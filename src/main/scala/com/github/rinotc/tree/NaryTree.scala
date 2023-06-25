@@ -1,6 +1,7 @@
 package com.github.rinotc.tree
 
 import scala.annotation.tailrec
+import scala.collection.mutable
 
 /**
  * 多分木
@@ -52,5 +53,24 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
     }
 
     NaryTree(f(node), loop(children, List.empty))
+  }
+}
+
+object NaryTree {
+
+  def buildFrom[Node <: AdjacencyListElement](adjacencyList: List[Node]): NaryTree[Node] = {
+    val rootNodes = adjacencyList.filter(_.parent.isEmpty)
+
+    def buildTree(node: Node): NaryTree[Node] = {
+      val children = adjacencyList.collect {
+        case child if child.parent.contains(node.data) => buildTree(child)
+      }
+      NaryTree(node, children)
+    }
+
+    rootNodes.headOption match {
+      case Some(root) => buildTree(root)
+      case None => throw new IllegalArgumentException("No root node found.")
+    }
   }
 }
