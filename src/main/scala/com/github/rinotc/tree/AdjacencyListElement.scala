@@ -6,6 +6,8 @@ package com.github.rinotc.tree
 trait AdjacencyListElement {
 
   type A
+
   def data: A
+
   def parent: Option[A]
 }
