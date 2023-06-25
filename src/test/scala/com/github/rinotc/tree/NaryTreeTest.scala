@@ -1,7 +1,5 @@
 package com.github.rinotc.tree
 
-import com.github.rinotc.tree
-
 class NaryTreeTest extends BaseTest {
 
   val naryTree: NaryTree[Int] = NaryTree(
