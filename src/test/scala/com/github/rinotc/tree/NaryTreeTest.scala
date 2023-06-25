@@ -16,11 +16,24 @@ class NaryTreeTest extends BaseTest {
     )
   )
 
+  describe("find") {
+    it("条件を満たすTreeを取得する") {
+      val actual = naryTree.find(_ == 2).value
+      val expected = NaryTree(2, List(
+        NaryTree(3, List.empty),
+        NaryTree(4, List(
+          NaryTree(5, List.empty),
+          NaryTree(6, List.empty)
+        ))
+      ))
+      assert(actual == expected)
+    }
+  }
 
   describe("filter") {
-    it("条件を満たすNodeを取得する") {
+    it("条件を満たすNodeを持つTreeを取得する") {
       val actual = naryTree.filter(_ % 2 == 1)
-      actual should contain theSameElementsAs List(1, 3, 5, 7)
+      actual.map(_.node) should contain theSameElementsAs List(1, 3, 5, 7)
     }
   }
 

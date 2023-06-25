@@ -5,21 +5,30 @@ import scala.annotation.tailrec
 /**
  * 多分木
  */
-class NaryTree[Node](val node: Node, val children: List[NaryTree[Node]]) {
+final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
-  /**
-   * 条件を満たす要素のリストを取得する
-   */
-  def filter(f: Node => Boolean): List[Node] = {
+  def find(f: Node => Boolean): Option[NaryTree[Node]] = {
     @tailrec
-    def loop(nodes: List[NaryTree[Node]], acc: List[Node]): List[Node] = nodes match {
+    def loop(nodes: List[NaryTree[Node]], stack: List[NaryTree[Node]]): Option[NaryTree[Node]] = {
+      nodes match {
+        case Nil => stack.headOption
+        case ::(head, next) =>
+          if (f(head.node)) Some(head)
+          else loop(head.children ::: next, stack)
+      }
+    }
+    loop(children, List(this))
+  }
+
+  def filter(f: Node => Boolean): List[NaryTree[Node]] = {
+    @tailrec
+    def loop(nodes: List[NaryTree[Node]], acc: List[NaryTree[Node]]): List[NaryTree[Node]] = nodes match {
       case Nil => acc
       case ::(head, next) =>
-        val newAcc = if (f(head.node)) head.node :: acc else acc
+        val newAcc = if (f(head.node)) head :: acc else acc
         loop(next ++ head.children, newAcc)
     }
-
-    loop(children, List(this.node))
+    loop(children, List(this))
   }
 
   def flatten: List[Node] = {
@@ -44,11 +53,4 @@ class NaryTree[Node](val node: Node, val children: List[NaryTree[Node]]) {
 
     NaryTree(f(node), loop(children, List.empty))
   }
-
-
-}
-
-object NaryTree {
-
-  def apply[Node](node: Node, children: List[NaryTree[Node]]) = new NaryTree[Node](node, children)
 }
