@@ -17,6 +17,7 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
           else loop(head.children ::: next, stack)
       }
     }
+
     loop(children, List(this))
   }
 
@@ -28,8 +29,24 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
         val newAcc = if (f(head.node)) head :: acc else acc
         loop(next ++ head.children, newAcc)
     }
+
     loop(children, List(this))
   }
+
+  /**
+   * 条件を満たす要素の数を返す
+   */
+  def countIf(f: Node => Boolean): Int = flatten.count(f)
+
+  def height: Int = {
+    if (children.isEmpty) 0 // 子がない場合は高さは0
+    else {
+      val childHeights = children.map(_.height) // 子の高さを再帰的に計算
+      1 + childHeights.max // 子の最大高さに自身のノードを追加した高さを返す
+    }
+  }
+
+  def ascendantsOf(f: Node => Boolean): List[Node] = ???
 
   def flatten: List[Node] = {
     @tailrec

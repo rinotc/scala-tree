@@ -37,6 +37,26 @@ class NaryTreeTest extends BaseTest {
     }
   }
 
+  describe("countIf") {
+    it("条件を満たす要素の数を返す") {
+      val actual = naryTree.countIf(_ % 2 == 1)
+      actual shouldBe 4
+    }
+  }
+
+  describe("height") {
+    it("木の高さを返す") {
+      naryTree.height shouldBe 3
+    }
+  }
+
+  describe("descendantsOf") {
+    ignore("条件を満たすNodeより祖先のNodeのリストを取得する") {
+      val actual = naryTree.ascendantsOf(_ == 4)
+      actual should contain theSameElementsAs List(1, 2)
+    }
+  }
+
   describe("flatten") {
     it("要素をフラットにする") {
       val actual = naryTree.flatten
