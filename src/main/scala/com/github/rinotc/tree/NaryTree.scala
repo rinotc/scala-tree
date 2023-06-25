@@ -9,16 +9,15 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
   def find(f: Node => Boolean): Option[NaryTree[Node]] = {
     @tailrec
-    def loop(nodes: List[NaryTree[Node]], stack: List[NaryTree[Node]]): Option[NaryTree[Node]] = {
+    def loop(nodes: List[NaryTree[Node]]): Option[NaryTree[Node]] = {
       nodes match {
-        case Nil => stack.headOption
+        case Nil => None
         case ::(head, next) =>
           if (f(head.node)) Some(head)
-          else loop(head.children ::: next, stack)
+          else loop(head.children ::: next)
       }
     }
-
-    loop(children, List(this))
+    if (f(node)) Some(this) else loop(children)
   }
 
   def filter(f: Node => Boolean): List[NaryTree[Node]] = {
