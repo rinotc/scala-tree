@@ -47,6 +47,18 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
     loop(children, List(this.node))
   }
 
+  /**
+   * 木を全てflatにする.
+   *
+   * @example
+   * {{{
+   *    1            1         2        3       4     5
+   *   / \          / \                / \
+   *  2   3    ->  2   3              4   5
+   *     / \          / \
+   *    4   5        4   5,        ,        ,      ,
+   * }}}
+   */
   def flatTree: List[NaryTree[Node]] = {
     @tailrec
     def loop(nodes: List[NaryTree[Node]], acc: List[NaryTree[Node]]): List[NaryTree[Node]] = nodes match {
