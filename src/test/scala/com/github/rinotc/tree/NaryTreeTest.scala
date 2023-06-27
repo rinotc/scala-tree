@@ -64,6 +64,51 @@ class NaryTreeTest extends BaseTest {
     }
   }
 
+  describe("flatTree") {
+    it("木を全て一番上に持ってくる") {
+      val t1 = NaryTree(
+        1,
+        List(
+          NaryTree(2, List(
+            NaryTree(3, List.empty),
+            NaryTree(4, List(
+              NaryTree(5, List.empty),
+              NaryTree(6, List.empty)
+            ))
+          )),
+          NaryTree(7, List.empty)
+        )
+      )
+      val t2 = NaryTree(2, List(
+        NaryTree(3, List.empty),
+        NaryTree(4, List(
+          NaryTree(5, List.empty),
+          NaryTree(6, List.empty)
+        ))
+      ))
+      val t3 = NaryTree(3, List.empty)
+      val t4 = NaryTree(4, List(
+        NaryTree(5, List.empty),
+        NaryTree(6, List.empty)
+      ))
+      val t5 = NaryTree(5, List.empty)
+      val t6 = NaryTree(6, List.empty)
+      val t7 = NaryTree(7, List.empty)
+
+      t1.flatTree.length shouldBe 7
+      t1.flatTree should contain theSameElementsAs List(t1, t2, t3, t4, t5, t6, t7)
+      t2.flatTree.length shouldBe 5
+      t2.flatTree should contain theSameElementsAs List(t2, t3, t4, t5, t6)
+      t3.flatTree.length shouldBe 1
+      t3.flatTree should contain theSameElementsAs List(t3)
+      t4.flatTree.length shouldBe 3
+      t4.flatTree should contain theSameElementsAs List(t4, t5, t6)
+      t5.flatTree should contain theSameElementsAs List(t5)
+      t6.flatTree should contain theSameElementsAs List(t6)
+      t7.flatTree should contain theSameElementsAs List(t7)
+    }
+  }
+
   describe("map") {
     it("全ての要素に関数を適用する") {
       val actual = naryTree.map(_ * 2)

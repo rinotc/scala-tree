@@ -7,18 +7,7 @@ import scala.annotation.tailrec
  */
 final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
-  def find(f: Node => Boolean): Option[NaryTree[Node]] = {
-    @tailrec
-    def loop(nodes: List[NaryTree[Node]]): Option[NaryTree[Node]] = {
-      nodes match {
-        case Nil => None
-        case ::(head, next) =>
-          if (f(head.node)) Some(head)
-          else loop(head.children ::: next)
-      }
-    }
-    if (f(node)) Some(this) else loop(children)
-  }
+  def find(f: Node => Boolean): Option[NaryTree[Node]] = flatTree.find(t => f(t.node))
 
   def filter(f: Node => Boolean): List[NaryTree[Node]] = {
     @tailrec
@@ -56,6 +45,16 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
     }
 
     loop(children, List(this.node))
+  }
+
+  def flatTree: List[NaryTree[Node]] = {
+    @tailrec
+    def loop(nodes: List[NaryTree[Node]], acc: List[NaryTree[Node]]): List[NaryTree[Node]] = nodes match {
+      case Nil => acc
+      case ::(head, next) =>
+        loop(head.children ++ next, head :: acc)
+    }
+    loop(children, List(this))
   }
 
   def map[B](f: Node => B): NaryTree[B] = {
