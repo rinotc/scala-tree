@@ -81,10 +81,16 @@ class NaryTreeTest extends BaseTest {
     }
   }
 
-  describe("descendantsOf") {
-    ignore("条件を満たすNodeより祖先のNodeのリストを取得する") {
-      val actual = naryTree.ascendantsOf(_ == 4)
-      actual should contain theSameElementsAs List(1, 2)
+  describe("findPath") {
+    it("条件を満たす要素までのルートノードからの経路を取得する") {
+      val actual = naryTree.findPath(_ == 5).value
+      val expected = List(1, 2, 4, 5)
+      actual should contain theSameElementsInOrderAs expected // 順序も保証する
+    }
+
+    it("条件を満たす要素が存在しない場合はNoneを返す") {
+      val actual = naryTree.findPath(_ == 99)
+      actual shouldBe None
     }
   }
 

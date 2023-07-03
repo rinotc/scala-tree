@@ -48,7 +48,19 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
     }
   }
 
-  def ascendantsOf(f: Node => Boolean): List[Node] = ???
+  /**
+   * 条件を満たす要素までのルートノードからの経路を取得する
+   *
+   * @return 条件を満たす要素があれば、ルートノードから順に、条件を満たしたノード含めてListで返す
+   */
+  def findPath(f: Node => Boolean): Option[List[Node]] = {
+    if (f(this.node)) Some(List(this.node))
+    else {
+      children.flatMap(child => child.findPath(f))
+        .headOption
+        .map(node :: _)
+    }
+  }
 
   def flatten: List[Node] = {
     @tailrec
@@ -98,8 +110,9 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
   /**
    * 条件を満たす子ノード以下のみの木を再構築する.
+   *
    * @note 上位のノードが条件を満たさない場合は、それより下のノードが条件を満たしていたとしても
-   * 木には含まれない。
+   *       木には含まれない。
    * @example
    * f: node % 2 == 0
    * {{{
