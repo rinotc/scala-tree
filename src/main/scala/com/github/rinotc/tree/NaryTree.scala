@@ -86,6 +86,7 @@ object NaryTree {
 
   def buildFrom[Node <: AdjacencyListElement](adjacencyList: List[Node]): NaryTree[Node] = {
     val rootNodes = adjacencyList.filter(_.parent.isEmpty)
+    require(rootNodes.lengthIs == 1, "root nodes must be only 1.")
 
     def buildTree(node: Node): NaryTree[Node] = {
       val children = adjacencyList.collect {
