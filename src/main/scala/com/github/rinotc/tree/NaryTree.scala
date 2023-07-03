@@ -94,6 +94,13 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
     NaryTree(f(node), loop(children, List.empty))
   }
+
+  def prune(f: Node => Boolean): NaryTree[Node] = {
+    val cs = this.children.collect {
+      case child if f(child.node) => child.prune(f)
+    }
+    NaryTree(this.node, cs)
+  }
 }
 
 object NaryTree {

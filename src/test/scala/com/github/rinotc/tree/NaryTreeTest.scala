@@ -174,6 +174,24 @@ class NaryTreeTest extends BaseTest {
     }
   }
 
+  describe("prune") {
+    it("条件を満たすnodeだけのツリーを作る。rootNodeはその条件に含まない.") {
+      val actual = naryTree.prune(_ % 2 == 0)
+      val expected = NaryTree(
+        1,
+        List(
+          NaryTree(2, List(
+            NaryTree(4, List(
+              NaryTree(6, List.empty)
+            ))
+          )),
+        )
+      )
+
+      assert(actual == expected)
+    }
+  }
+
   describe("buildTreeList") {
     it("ルートが一つだけ存在する隣接リストから、N分木を構築する") {
       val e1 = AdjEle(1, None)
