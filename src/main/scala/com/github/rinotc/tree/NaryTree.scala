@@ -1,9 +1,10 @@
 package com.github.rinotc.tree
 
+
 import scala.annotation.tailrec
 
 /**
- * 多分木
+ * N分木
  */
 final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
@@ -66,6 +67,7 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
       case ::(head, next) =>
         loop(head.children ++ next, head :: acc)
     }
+
     loop(children, List(this))
   }
 
@@ -84,7 +86,14 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
 object NaryTree {
 
-  def buildFrom[Node <: AdjacencyListElement](adjacencyList: List[Node]): NaryTree[Node] = {
+  /**
+   * ルートノードを一つもつ隣接リスト要素のリストから、N分木を構築する
+   *
+   * @param adjacencyList 隣接リスト. 親要素を持たないレコードが一つだけ存在する必要がある。
+   * @tparam Node [[AdjacencyListElement]] を継承しているデータ型
+   * @return ルートノードからの[[NaryTree]]
+   */
+  def buildFromRoot[Node <: AdjacencyListElement](adjacencyList: List[Node]): NaryTree[Node] = {
     val rootNodes = adjacencyList.filter(_.parent.isEmpty)
     require(rootNodes.lengthIs == 1, "root nodes must be only 1.")
 
@@ -95,9 +104,34 @@ object NaryTree {
       NaryTree(node, children)
     }
 
-    rootNodes.headOption match {
-      case Some(root) => buildTree(root)
-      case None => throw new IllegalArgumentException("No root node found.")
+    buildTree(rootNodes.head) // requireでルートノードが一つだけであることを制約済み
+  }
+
+  /**
+   * 隣接リストから、[[NaryTree]] のリストを構築する
+   */
+  def buildTreeList[Node <: AdjacencyListElement](adjacencyList: List[Node]): List[NaryTree[Node]] = {
+
+    val parentEmptyNodes = adjacencyList.filter(_.parent.isEmpty)
+    if (parentEmptyNodes.lengthIs == 1) List(buildFromRoot(adjacencyList)) // ルートノードが一つのみ
+    else if (parentEmptyNodes.lengthIs > 1) { // ルートノードが複数ある
+      def constructTree(data: Node#A): NaryTree[Node] = {
+        val children = adjacencyList.filter(_.parent.contains(data))
+          .map(node => constructTree(node.data))
+        NaryTree(adjacencyList.find(_.data == data).get, children)
+      }
+
+      parentEmptyNodes.map(node => constructTree(node.data))
+    } else { // ルートノードがリストに含まれてない（部分木）
+      val nodeMap: Map[Node#A, List[Node]] = adjacencyList.groupBy(_.parent.get)
+      val rootNodes = adjacencyList.flatMap(_.parent).toSet intersect adjacencyList.map(_.data).toSet
+
+      def constructTree(data: Node#A): NaryTree[Node] = {
+        val children = nodeMap.getOrElse(data, Nil).map(child => constructTree(child.data))
+        NaryTree(adjacencyList.find(_.data == data).get, children)
+      }
+
+      rootNodes.map(constructTree).toList
     }
   }
 }

@@ -1,6 +1,14 @@
 package com.github.rinotc.tree
 
+object NaryTreeTest {
+  case class AdjEle(data: Int, parent: Option[Int]) extends AdjacencyListElement {
+    type A = Int
+  }
+}
+
 class NaryTreeTest extends BaseTest {
+
+  import NaryTreeTest._
 
   val naryTree: NaryTree[Int] = NaryTree(
     1,
@@ -116,11 +124,7 @@ class NaryTreeTest extends BaseTest {
     }
   }
 
-  describe("buildFrom") {
-    case class AdjEle(data: Int, parent: Option[Int]) extends AdjacencyListElement {
-      type A = Int
-    }
-
+  describe("buildFromRoot") {
     it("隣接リストから多分木を構築する") {
 
       val e1 = AdjEle(1, None)
@@ -132,7 +136,7 @@ class NaryTreeTest extends BaseTest {
       val e7 = AdjEle(7, Some(6))
       val list = List(e1, e2, e3, e4, e5, e6, e7)
 
-      val actual: NaryTree[AdjEle] = NaryTree.buildFrom(list)
+      val actual: NaryTree[AdjEle] = NaryTree.buildFromRoot(list)
 
       val expected = NaryTree(
         e1,
@@ -151,4 +155,108 @@ class NaryTreeTest extends BaseTest {
       assert(actual == expected)
     }
   }
+
+  describe("buildTreeList") {
+    it("ルートが一つだけ存在する隣接リストから、N分木を構築する") {
+      val e1 = AdjEle(1, None)
+      val e2 = AdjEle(2, Some(1))
+      val e3 = AdjEle(3, Some(1))
+      val e4 = AdjEle(4, Some(2))
+      val e5 = AdjEle(5, Some(2))
+      val e6 = AdjEle(6, Some(3))
+      val e7 = AdjEle(7, Some(6))
+      val list = List(e1, e2, e3, e4, e5, e6, e7)
+
+      val actual: List[NaryTree[AdjEle]] = NaryTree.buildTreeList(list)
+
+      val expected = List(
+        NaryTree(
+          e1,
+          List(
+            NaryTree(e2, List(
+              NaryTree(e4, List()),
+              NaryTree(e5, List()),
+            )),
+            NaryTree(e3, List(
+              NaryTree(e6, List(
+                NaryTree(e7, List())
+              ))
+            ))
+          )
+        )
+      )
+      actual should contain theSameElementsAs expected
+    }
+
+    it("ルートノードが複数存在する、つまり、parentがNoneのNodeが複数存在する隣接リストからN分木を構築する") {
+      val a0 = AdjEle(10, None)
+      val a1 = AdjEle(11, Some(10))
+      val a2 = AdjEle(12, Some(10))
+      val a3 = AdjEle(13, Some(10))
+      val a4 = AdjEle(14, Some(11))
+      val a5 = AdjEle(15, Some(12))
+      val a6 = AdjEle(16, Some(12))
+      val a7 = AdjEle(17, Some(13))
+      val a8 = AdjEle(18, Some(13))
+      val aList = List(a0, a1, a2, a3, a4, a5, a6, a7, a8)
+
+      val b0 = AdjEle(20, None)
+      val b1 = AdjEle(21, Some(20))
+      val b2 = AdjEle(22, Some(20))
+      val b3 = AdjEle(23, Some(22))
+      val b4 = AdjEle(24, Some(22))
+      val b5 = AdjEle(25, Some(22))
+      val bList = List(b0, b1, b2, b3, b4, b5)
+
+      val c0 = AdjEle(30, None)
+      val c1 = AdjEle(31, Some(30))
+      val cList = List(c0, c1)
+
+      val actual = NaryTree.buildTreeList(aList ++ bList ++ cList)
+
+      val expected = List(
+        NaryTree(a0, List(
+          NaryTree(a1, List(NaryTree(a4, List.empty))),
+          NaryTree(a2, List(NaryTree(a5, List.empty), NaryTree(a6, List.empty))),
+          NaryTree(a3, List(NaryTree(a7, List.empty), NaryTree(a8, List.empty))),
+        )),
+        NaryTree(b0, List(
+          NaryTree(b1, List()),
+          NaryTree(b2, List(
+            NaryTree(b3, List.empty),
+            NaryTree(b4, List.empty),
+            NaryTree(b5, List.empty)
+          ))
+        )),
+        NaryTree(c0, List(NaryTree(c1, List.empty)))
+      )
+
+      actual.length shouldBe 3
+      actual should contain theSameElementsAs expected
+      actual.flatMap(_.flatten) should contain theSameElementsAs aList ++ bList ++ cList
+    }
+
+    it("ルートノード、つまりparentがNoneのレコードが存在しない場合") {
+      val a1 = AdjEle(11, Some(10))
+      val a2 = AdjEle(12, Some(10))
+      val a3 = AdjEle(13, Some(10))
+      val a4 = AdjEle(14, Some(11))
+      val a5 = AdjEle(15, Some(12))
+      val a6 = AdjEle(16, Some(12))
+      val a7 = AdjEle(17, Some(13))
+      val a8 = AdjEle(18, Some(13))
+      val aList = List(a1, a2, a3, a4, a5, a6, a7, a8)
+
+      val actual = NaryTree.buildTreeList(aList)
+
+      val expected = List(
+        NaryTree(a1, List(NaryTree(a4, List.empty))),
+        NaryTree(a2, List(NaryTree(a5, List.empty), NaryTree(a6, List.empty))),
+        NaryTree(a3, List(NaryTree(a7, List.empty), NaryTree(a8, List.empty))),
+      )
+
+      actual should contain theSameElementsAs expected
+    }
+  }
 }
+
