@@ -12,6 +12,7 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
   /**
    * 条件を満たすNaryTreeのリストを取得する
+   *
    * @example
    * f: num % 2 == 1
    * {{{
@@ -95,6 +96,22 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
     NaryTree(f(node), loop(children, List.empty))
   }
 
+  /**
+   * 条件を満たす子ノード以下のみの木を再構築する.
+   * @note 上位のノードが条件を満たさない場合は、それより下のノードが条件を満たしていたとしても
+   * 木には含まれない。
+   * @example
+   * f: node % 2 == 0
+   * {{{
+   *       1               1
+   *    /  \  \           / \
+   *   2    7  10  ->   2    10
+   *  / \    \           \
+   * 3   4    8           4
+   *    / \                \
+   *   5   6                6
+   * }}}
+   */
   def prune(f: Node => Boolean): NaryTree[Node] = {
     val cs = this.children.collect {
       case child if f(child.node) => child.prune(f)

@@ -20,7 +20,9 @@ class NaryTreeTest extends BaseTest {
           NaryTree(6, List.empty)
         ))
       )),
-      NaryTree(7, List.empty)
+      NaryTree(7, List(
+        NaryTree(8, List.empty)
+      ))
     )
   )
 
@@ -52,13 +54,16 @@ class NaryTreeTest extends BaseTest {
                 NaryTree(6, List.empty)
               ))
             )),
-            NaryTree(7, List.empty)
+            NaryTree(7, List(NaryTree(8, List.empty)))
           )
         ),
         NaryTree(3, List.empty),
         NaryTree(5, List.empty),
-        NaryTree(7, List.empty)
+        NaryTree(7, List(
+          NaryTree(8, List.empty)
+        ))
       )
+      actual.length shouldBe 4
       actual should contain theSameElementsAs expected
     }
   }
@@ -86,7 +91,7 @@ class NaryTreeTest extends BaseTest {
   describe("flatten") {
     it("要素をフラットにする") {
       val actual = naryTree.flatten
-      actual should contain theSameElementsAs List(1, 2, 3, 4, 5, 6, 7)
+      actual should contain theSameElementsAs List(1, 2, 3, 4, 5, 6, 7, 8)
     }
   }
 
@@ -138,9 +143,47 @@ class NaryTreeTest extends BaseTest {
   describe("map") {
     it("全ての要素に関数を適用する") {
       val actual = naryTree.map(_ * 2)
-      actual.flatten should contain theSameElementsAs List(2, 4, 6, 8, 10, 12, 14)
+      actual.flatten should contain theSameElementsAs List(2, 4, 6, 8, 10, 12, 14, 16)
     }
   }
+
+
+  describe("prune") {
+    it("条件を満たすnodeだけのツリーを作る。rootNodeはその条件に含まない。") {
+      val nTree: NaryTree[Int] = NaryTree(
+        1,
+        List(
+          NaryTree(2, List(
+            NaryTree(3, List.empty),
+            NaryTree(4, List(
+              NaryTree(5, List.empty),
+              NaryTree(6, List.empty)
+            ))
+          )),
+          NaryTree(7, List(
+            NaryTree(8, List.empty), // 上位のノードが条件を満たさない場合は、下のノードが条件を満たしても木には含まれない
+            NaryTree(9, List.empty)
+          )),
+          NaryTree(10, List.empty)
+        )
+      )
+      val actual = nTree.prune(_ % 2 == 0)
+      val expected = NaryTree(
+        1,
+        List(
+          NaryTree(2, List(
+            NaryTree(4, List(
+              NaryTree(6, List.empty)
+            ))
+          )),
+          NaryTree(10, List.empty)
+        )
+      )
+
+      assert(actual == expected)
+    }
+  }
+
 
   describe("buildFromRoot") {
     it("隣接リストから多分木を構築する") {
@@ -170,24 +213,6 @@ class NaryTreeTest extends BaseTest {
           ))
         )
       )
-      assert(actual == expected)
-    }
-  }
-
-  describe("prune") {
-    it("条件を満たすnodeだけのツリーを作る。rootNodeはその条件に含まない.") {
-      val actual = naryTree.prune(_ % 2 == 0)
-      val expected = NaryTree(
-        1,
-        List(
-          NaryTree(2, List(
-            NaryTree(4, List(
-              NaryTree(6, List.empty)
-            ))
-          )),
-        )
-      )
-
       assert(actual == expected)
     }
   }
