@@ -10,6 +10,18 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
   def find(f: Node => Boolean): Option[NaryTree[Node]] = flatTree.find(t => f(t.node))
 
+  /**
+   * 条件を満たすNaryTreeのリストを取得する
+   * @example
+   * f: num % 2 == 1
+   * {{{
+   *      1            1          3      5
+   *     / \          / \        / \
+   *    2   3    ->  2   3      4   5
+   *       / \          / \
+   *      4   5        4   5,        ,
+   * }}}
+   */
   def filter(f: Node => Boolean): List[NaryTree[Node]] = {
     @tailrec
     def loop(nodes: List[NaryTree[Node]], acc: List[NaryTree[Node]]): List[NaryTree[Node]] = nodes match {
