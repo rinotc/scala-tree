@@ -149,7 +149,22 @@ class NaryTreeTest extends BaseTest {
   describe("map") {
     it("全ての要素に関数を適用する") {
       val actual = naryTree.map(_ * 2)
-      actual.flatten should contain theSameElementsAs List(2, 4, 6, 8, 10, 12, 14, 16)
+      val expected = NaryTree(
+        2,
+        List(
+          NaryTree(4, List(
+            NaryTree(6, List.empty),
+            NaryTree(8, List(
+              NaryTree(10, List.empty),
+              NaryTree(12, List.empty)
+            ))
+          )),
+          NaryTree(14, List(
+            NaryTree(16, List.empty)
+          ))
+        )
+      )
+      actual shouldBe expected
     }
   }
 

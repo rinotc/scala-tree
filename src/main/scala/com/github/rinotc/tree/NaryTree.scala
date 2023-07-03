@@ -8,6 +8,9 @@ import scala.annotation.tailrec
  */
 final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
 
+  /**
+   * 自身含む全ての子孫Nodeのうち、条件を満たすNodeを持つ木を見つける。
+   */
   def find(f: Node => Boolean): Option[NaryTree[Node]] = flatTree.find(t => f(t.node))
 
   /**
@@ -99,7 +102,7 @@ final case class NaryTree[Node](node: Node, children: List[NaryTree[Node]]) {
   def map[B](f: Node => B): NaryTree[B] = {
     def loop(nodes: List[NaryTree[Node]], acc: List[NaryTree[B]]): List[NaryTree[B]] = {
       nodes match {
-        case Nil => acc
+        case Nil => acc.reverse
         case ::(head, next) =>
           loop(next, NaryTree(f(head.node), loop(head.children, List.empty)) :: acc)
       }
